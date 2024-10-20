@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>足揉み券検証システム</title>
+    <link rel="stylesheet" href="dstyles.css">
+</head>
+<body>
+    <div class="banner">
+        足揉み券検証システム
+    </div>
+
+    <div id="password-section">
+        <h2>パスワードを入力してください</h2>
+        <input type="password" id="password-input" placeholder="パスワード">
+        <button onclick="checkPassword()">送信</button>
+    </div>
+
+    <div id="form-section" style="display: none;">
+        <h2>回数を入力してください</h2>
+        <input type="number" id="count-input" placeholder="回数">
+        <button onclick="submitForm()">送信</button>
+
+        <div id="success-message" style="display: none;">Successful!</div>
+    </div>
+
+    <div id="history-section" style="display: none;">
+        <h2>過去の入力履歴</h2>
+        <ul id="history-list"></ul>
+        <button onclick="clearHistory()">履歴を消去する</button>
+        
+        <div id="total-count">合計回数: 0</div>
+        <div id="days-since">最初の入力日から経過日数: 0日</div>
+    </div>
+
+    <script src="dscript.js"></script>
+</body>
+</html>
