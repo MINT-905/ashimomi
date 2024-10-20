@@ -1,26 +1,43 @@
+// URLのクエリパラメータから数字を取得
+let urlParams = new URLSearchParams(window.location.search);
+let preloadedCount = urlParams.get('count'); // 例: ?count=5 で5が取得される
+
+// ページロード時に数字があればフォームに表示しておく
+window.onload = function() {
+    if (preloadedCount) {
+        document.getElementById('count-input').value = preloadedCount;
+    }
+};
+
 // パスワードを確認してフォームを表示する
 function checkPassword() {
     const password = document.getElementById('password-input').value;
 
-    if (password === 'minto') {  // パスワードは例として'1234'にしています。
+    if (password === '1234') {  // パスワードは例として'1234'にしています。
         document.getElementById('password-section').style.display = 'none';
         document.getElementById('form-section').style.display = 'block';
-        loadHistory();  // 過去の履歴を表示
+
+        // URLから取得した数字があれば自動で記録
+        if (preloadedCount) {
+            submitForm(preloadedCount);  // パスワード認証後に自動で記録
+        } else {
+            loadHistory();  // 履歴を表示
+        }
     } else {
         alert('パスワードが違います');
     }
 }
 
 // フォームを送信して成功メッセージを表示する
-function submitForm() {
-    const count = document.getElementById('count-input').value;
+function submitForm(preloadedValue = null) {
+    const count = preloadedValue || document.getElementById('count-input').value;
     const today = new Date().toLocaleDateString();
 
     if (count !== '') {
         // 成功メッセージを表示
         document.body.style.backgroundColor = '#4CAF50';  // 画面を緑色にする
         document.getElementById('success-message').style.display = 'block';
-        
+
         // デバイスに保存
         saveData(count, today);
 
@@ -48,43 +65,40 @@ function loadHistory() {
     const historyList = document.getElementById('history-list');
     historyList.innerHTML = '';
 
-    let totalCount = 0;
+    let total = 0;
     let firstDate = null;
 
-    history.forEach(entry => {
-        const li = document.createElement('li');
-        li.textContent = `${entry.date} - 回数: ${entry.count}`;
-        historyList.appendChild(li);
+    history.forEach((entry, index) => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `記録 ${index + 1}: ${entry.count} 回 - 日付: ${entry.date}`;
+        historyList.appendChild(listItem);
 
-        totalCount += entry.count;
-        if (!firstDate) {
+        // 合計回数を計算
+        total += entry.count;
+
+        // 最初の入力日の記録
+        if (index === 0) {
             firstDate = new Date(entry.date);
         }
     });
 
     // 合計回数を表示
-    document.getElementById('total-count').textContent = `合計回数: ${totalCount}`;
+    document.getElementById('total-count').textContent = `合計回数: ${total}`;
 
-    // 最初の入力日からの日数を表示
+    // 最初の入力日からの経過日数を表示
     if (firstDate) {
         const today = new Date();
-        const timeDiff = Math.abs(today - firstDate);
-        const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));  // ミリ秒を日数に変換
-        document.getElementById('days-since').textContent = `最初の入力日から経過日数: ${daysDiff}日`;
-    }
-
-    if (history.length > 0) {
-        document.getElementById('history-section').style.display = 'block';
+        const daysPassed = Math.floor((today - firstDate) / (1000 * 60 * 60 * 24));
+        document.getElementById('days-passed').textContent = `最初の入力から経過した日数: ${daysPassed}日`;
     }
 }
 
-// 履歴を消去する機能
+// 履歴を削除する機能
 function clearHistory() {
-    if (confirm('履歴を本当に消去しますか？')) {
+    if (confirm('履歴を本当に削除しますか？')) {
         localStorage.removeItem('mhistory');
         document.getElementById('history-list').innerHTML = '';
         document.getElementById('total-count').textContent = '合計回数: 0';
-        document.getElementById('days-since').textContent = '最初の入力日から経過日数: 0日';
-        alert('履歴が消去されました');
+        document.getElementById('days-passed').textContent = '最初の入力から経過した日数: 0日';
     }
 }
